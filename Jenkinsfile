@@ -1,41 +1,80 @@
+// pipeline {
+//     agent any
+
+//     stages {
+//         stage('Checkout Code') {
+//             steps {
+//                 git branch: 'main', url: 'https://github.com/Aayushi2104/SAPP'
+//             }
+//         }
+
+//         stage('Build and Run with Docker Compose') {
+//             steps {
+//                 script {
+//                     sh 'docker-compose down'
+//                     sh 'docker-compose up --build -d'
+//                 }
+//             }
+//         }
+
+//         stage('Verify Containers') {
+//             steps {
+//                 sh 'docker ps -a'
+//             }
+//         }
+
+//         stage('Clean Unused Images') {
+//             steps {
+//                 sh 'docker image prune -f || true'
+//             }
+//         }
+//     }
+
+//     post {
+//         success {
+//             echo '✅ Deployment successful!'
+//         }
+//         failure {
+//             echo '❌ Pipeline failed!'
+//         }
+//     }
+// }
 pipeline {
     agent any
 
+    environment {
+        COMPOSE_PROJECT_NAME = 'youtube-backend'
+    }
+
     stages {
-        stage('Checkout Code') {
+        stage('Clone Repository') {
             steps {
-                git branch: 'main', url: 'https://github.com/Aayushi2104/SAPP'
+                git 'https://github.com/Aayushi2104/SAPP.git'
             }
         }
 
-        stage('Build and Run with Docker Compose') {
+        stage('Build Docker Images') {
             steps {
-                script {
-                    sh 'docker-compose down'
-                    sh 'docker-compose up --build -d'
-                }
+                sh 'docker-compose build'
             }
         }
 
-        stage('Verify Containers') {
+        stage('Run Containers') {
             steps {
-                sh 'docker ps -a'
+                sh 'docker-compose up -d'
             }
         }
 
-        stage('Clean Unused Images') {
+        stage('Check Running Containers') {
             steps {
-                sh 'docker image prune -f || true'
+                sh 'docker ps'
             }
         }
     }
 
     post {
-        success {
-            echo '✅ Deployment successful!'
-        }
-        failure {
-            echo '❌ Pipeline failed!'
+        always {
+            echo 'Pipeline finished!'
         }
     }
 }
