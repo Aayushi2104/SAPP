@@ -5,49 +5,112 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
-<body>
-    <div class="w-full min-h-screen bg-zinc-900 text-white p-10">
-        <h3 class="text-3xl"><span class="font-light">Hello</span>, <%= user.name %></h3>
-        <h5 class="mb-5">All Posts</h5>
-        <div class="posts mt-20">
-            <h3 class="text-zinc-400">Posts from all users</h3>
-            <div class="postcontainer mt-5">
+<body class="bg-gradient-to-br from-gray-900 to-black text-gray-100">
+    <div class="max-w-6xl mx-auto px-4 py-10">
+        <!-- Header with navigation -->
+        <nav class="flex justify-between items-center mb-10">
+            <div class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-600">
+                SocialApp
+            </div>
+            <div class="flex gap-4 items-center">
+                <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                    <i class="fas fa-home text-lg"></i>
+                </a>
+                <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                    <i class="fas fa-bell text-lg"></i>
+                </a>
+                <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                    <i class="fas fa-envelope text-lg"></i>
+                </a>
+                <div class="w-8 h-8 rounded-full overflow-hidden border-2 border-blue-500">
+                    <img src="/api/placeholder/32/32" alt="Profile" class="w-full h-full object-cover">
+                </div>
+            </div>
+        </nav>
+
+        <!-- Welcome section -->
+        <div class="mb-12">
+            <h3 class="text-4xl mb-2">
+                <span class="font-light text-gray-400">Hello,</span> 
+                <span class="font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-600"><%= user.name %></span>
+            </h3>
+            <p class="text-gray-400">Welcome back to your dashboard</p>
+        </div>
+
+        <!-- Posts section -->
+        <div class="mb-10">
+            <div class="flex justify-between items-center mb-6">
+                <h5 class="text-2xl font-bold">All Posts</h5>
+                <button class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors">
+                    New Post
+                </button>
+            </div>
+
+            <div class="space-y-6">
                 <% posts.reverse().forEach(function(post) { %>
-                    <div class="post mb-4 w-full max-w-md rounded-md p-2 border border-zinc-800">
-                        <div class="flex gap-3">
-                            <div class="w-8 h-8 rounded-md overflow-hidden">
+                    <div class="rounded-xl bg-gray-800/50 backdrop-blur-sm border border-gray-700 p-5 transition-all hover:shadow-lg hover:shadow-blue-900/20">
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="w-12 h-12 rounded-full overflow-hidden border-2 border-blue-500">
                                 <a href="/profile/<%= post.user._id %>">
                                     <img class="w-full h-full object-cover" src="/images/uploads/<%= post.user.profilepic %>" alt="Profile Picture">
                                 </a>
                             </div>
-                            <h4 class="text-blue-500 mb-2"><%= post.user.name %></h4>
+                            <div>
+                                <a href="/profile/<%= post.user._id %>" class="font-semibold text-lg text-blue-400 hover:text-blue-300 transition-colors">
+                                    <%= post.user.name %>
+                                </a>
+                                <p class="text-xs text-gray-400">Posted 2 hours ago</p>
+                            </div>
                         </div>
+
+                        <p class="text-gray-200 mb-4 leading-relaxed"><%= post.content %></p>
+
                         <% if (post.media.length > 0) { %>
-                            <% post.media.forEach(function(media) { %>
-                                <% if (media.mimetype.startsWith('image')) { %>
-                                    <img src="/images/uploads/<%= media.filename %>" alt="Post Image" class="w-full h-40 object-cover mb-2 rounded-md">
-                                <% } else if (media.mimetype.startsWith('video')) { %>
-                                    <video controls class="w-full h-40 object-cover mb-2 rounded-md">
-                                        <source src="/videos/uploads/<%= media.filename %>" type="<%= media.mimetype %>">
-                                    </video>
-                                <% } %>
-                            <% }) %>
+                            <div class="rounded-lg overflow-hidden mb-4">
+                                <% post.media.forEach(function(media) { %>
+                                    <% if (media.mimetype.startsWith('image')) { %>
+                                        <img src="/images/uploads/<%= media.filename %>" alt="Post Image" class="w-full object-cover rounded-lg">
+                                    <% } else if (media.mimetype.startsWith('video')) { %>
+                                        <video controls class="w-full rounded-lg">
+                                            <source src="/videos/uploads/<%= media.filename %>" type="<%= media.mimetype %>">
+                                        </video>
+                                    <% } %>
+                                <% }) %>
+                            </div>
                         <% } %>
-                        <p class="text-sm tracking-tight"><%= post.content %></p>
-                        <small class="mt-2 inline-block"><%= post.likes.length %> likes</small>
-                        <div class="btns flex gap-4 mt-1">
-                            <a class="text-blue-500" href="/like/<%= post._id %>">Like</a>
-                            <a class="text-zinc-600" href="/edit/<%= post._id %>">Edit</a>
-                            <a class="text-zinc-600" href="/post/<%= post._id %>">Comments</a> <!-- Link to post details page -->
+
+                        <div class="flex items-center justify-between mt-4 pt-4 border-t border-gray-700">
+                            <div class="flex items-center gap-6">
+                                <button class="like-button flex items-center gap-2 text-gray-300 hover:text-blue-400 transition-colors" data-post-id="<%= post._id %>">
+                                    <i class="far fa-heart"></i>
+                                    <span id="like-count-<%= post._id %>" class="text-sm"><%= post.likes.length %> likes</span>
+                                </button>
+                                <a href="/post/<%= post._id %>" class="flex items-center gap-2 text-gray-300 hover:text-blue-400 transition-colors">
+                                    <i class="far fa-comment"></i>
+                                    <span class="text-sm">Comments</span>
+                                </a>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <a href="/edit/<%= post._id %>" class="text-gray-400 hover:text-blue-400 transition-colors">
+                                    <i class="far fa-edit"></i>
+                                </a>
+                                <a href="#" class="text-gray-400 hover:text-red-400 transition-colors">
+                                    <i class="far fa-share-square"></i>
+                                </a>
+                            </div>
                         </div>
                     </div>
                 <% }) %>
             </div>
         </div>
+
+        <!-- Footer -->
+        <footer class="mt-20 text-center text-gray-500 text-sm">
+            <p>© 2025 SocialApp. All rights reserved.</p>
+        </footer>
     </div>
-</body>
-</html>
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
@@ -76,22 +139,21 @@
                             const likeCountElement = document.querySelector(`#like-count-${postId}`);
                             likeCountElement.textContent = `${data.likes} likes`;
     
-                            // Optionally, update UI or show message indicating successful like
-                            console.log('Post liked successfully');
+                            // Toggle heart icon
+                            const heartIcon = this.querySelector('i');
+                            heartIcon.classList.toggle('far');
+                            heartIcon.classList.toggle('fas');
+                            heartIcon.classList.toggle('text-red-500');
                         } else {
                             throw new Error('Failed to update like');
                         }
                     })
                     .catch(err => {
                         console.error('Error:', err);
-                        // Handle error, show message, or retry mechanism
                     });
                 });
             });
         });
     </script>
-    
-   
-    
 </body>
 </html>
