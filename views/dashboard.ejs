@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+    <div class="w-full min-h-screen bg-zinc-900 text-white p-10">
+        <h3 class="text-3xl"><span class="font-light">Hello</span>, <%= user.name %></h3>
+        <h5 class="mb-5">All Posts</h5>
+        <div class="posts mt-20">
+            <h3 class="text-zinc-400">Posts from all users</h3>
+            <div class="postcontainer mt-5">
+                <% posts.reverse().forEach(function(post) { %>
+                    <div class="post mb-4 w-full max-w-md rounded-md p-2 border border-zinc-800">
+                        <div class="flex gap-3">
+                            <div class="w-8 h-8 rounded-md overflow-hidden">
+                                <a href="/profile/<%= post.user._id %>">
+                                    <img class="w-full h-full object-cover" src="/images/uploads/<%= post.user.profilepic %>" alt="Profile Picture">
+                                </a>
+                            </div>
+                            <h4 class="text-blue-500 mb-2"><%= post.user.name %></h4>
+                        </div>
+                        <% if (post.media.length > 0) { %>
+                            <% post.media.forEach(function(media) { %>
+                                <% if (media.mimetype.startsWith('image')) { %>
+                                    <img src="/images/uploads/<%= media.filename %>" alt="Post Image" class="w-full h-40 object-cover mb-2 rounded-md">
+                                <% } else if (media.mimetype.startsWith('video')) { %>
+                                    <video controls class="w-full h-40 object-cover mb-2 rounded-md">
+                                        <source src="/videos/uploads/<%= media.filename %>" type="<%= media.mimetype %>">
+                                    </video>
+                                <% } %>
+                            <% }) %>
+                        <% } %>
+                        <p class="text-sm tracking-tight"><%= post.content %></p>
+                        <small class="mt-2 inline-block"><%= post.likes.length %> likes</small>
+                        <div class="btns flex gap-4 mt-1">
+                            <a class="text-blue-500" href="/like/<%= post._id %>">Like</a>
+                            <a class="text-zinc-600" href="/edit/<%= post._id %>">Edit</a>
+                            <a class="text-zinc-600" href="/post/<%= post._id %>">Comments</a> <!-- Link to post details page -->
+                        </div>
+                    </div>
+                <% }) %>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const likeButtons = document.querySelectorAll('.like-button');
+    
+            likeButtons.forEach(button => {
+                button.addEventListener('click', function (event) {
+                    event.preventDefault();
+                    const postId = this.dataset.postId;
+    
+                    fetch(`/like/${postId}`, {
+                        method: 'GET',
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json'
+                        }
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Failed to update like');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.success) {
+                            const likeCountElement = document.querySelector(`#like-count-${postId}`);
+                            likeCountElement.textContent = `${data.likes} likes`;
+    
+                            // Optionally, update UI or show message indicating successful like
+                            console.log('Post liked successfully');
+                        } else {
+                            throw new Error('Failed to update like');
+                        }
+                    })
+                    .catch(err => {
+                        console.error('Error:', err);
+                        // Handle error, show message, or retry mechanism
+                    });
+                });
+            });
+        });
+    </script>
+    
+   
+    
+</body>
+</html>
