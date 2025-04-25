@@ -39,6 +39,45 @@
 //         }
 //     }
 // }
+// pipeline {
+//     agent any
+
+//     environment {
+//         COMPOSE_PROJECT_NAME = 'youtube-backend'
+//     }
+
+//     // stages {
+//     //     stage('Clone Repository') {
+//     //         steps {
+//     //             git 'https://github.com/Aayushi2104/SAPP.git'
+//     //         }
+//     //     }
+
+//         stage('Build Docker Images') {
+//             steps {
+//                 sh 'docker-compose build'
+//             }
+//         }
+
+//         stage('Run Containers') {
+//             steps {
+//                 sh 'docker-compose up -d'
+//             }
+//         }
+
+//         stage('Check Running Containers') {
+//             steps {
+//                 sh 'docker ps'
+//             }
+//         }
+//     }
+
+//     post {
+//         always {
+//             echo 'Pipeline finished!'
+//         }
+//     }
+
 pipeline {
     agent any
 
@@ -46,13 +85,7 @@ pipeline {
         COMPOSE_PROJECT_NAME = 'youtube-backend'
     }
 
-    // stages {
-    //     stage('Clone Repository') {
-    //         steps {
-    //             git 'https://github.com/Aayushi2104/SAPP.git'
-    //         }
-    //     }
-
+    stages {
         stage('Build Docker Images') {
             steps {
                 sh 'docker-compose build'
