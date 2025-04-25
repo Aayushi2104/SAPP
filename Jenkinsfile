@@ -46,12 +46,12 @@ pipeline {
         COMPOSE_PROJECT_NAME = 'youtube-backend'
     }
 
-    stages {
-        stage('Clone Repository') {
-            steps {
-                git 'https://github.com/Aayushi2104/SAPP.git'
-            }
-        }
+    // stages {
+    //     stage('Clone Repository') {
+    //         steps {
+    //             git 'https://github.com/Aayushi2104/SAPP.git'
+    //         }
+    //     }
 
         stage('Build Docker Images') {
             steps {
